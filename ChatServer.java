@@ -12,7 +12,7 @@ public class ChatServer {
 
 //Method Members
 
-    void ChatServer() {
+    public ChatServer() {
         /*
         mainFrame = new JFrame("This is a test.");
         mainFrame.setSize(500, 300);
@@ -27,27 +27,56 @@ public class ChatServer {
     }
 
     public void CreateAccount(UserData newUser) {
-
+        UserList.insert(newUser);
     }
 
-    public void login() {}
-
-    public void AddThread(Thread toAdd) {
+    public UserData login(String name, String pswd) {
+        UserData find = null;
         if(UserList != null) {
-            UserList.AddThreads(toAdd);
+            find = UserList.login(name, pswd);
+        }
+        return find;
+    }
+
+    public void AddNewThread(Thread toAdd) {
+        UserList.addNewThread(toAdd);
+    }
+
+    public void sendMessage(Thread destination, Message toSend) {
+        if(destination != null && toSend != null) {
+            String title = destination.getTitle();
+            String[] receivers = destination.getParticipants();
+
+            UserList.sendMessage(receivers, title, toSend);
         }
     }
+
 
     public void ShowAllUsers() {
         UserList.showAllNames();
     }
 
     public static void main(String[] args) {
-        //ChatServer myServer = new ChatServer();
+        ChatServer test = new ChatServer();
+        String[] people = {"Bradley Maness", "James Hughes"};
 
-       // UserData test = myServer.UserList.searchName("Bradley Maness");
+        Thread testThread = new Thread("This is a test thread", people);
+        Thread testThread2 = new Thread("Second Thread", people);
 
-        //test.display();
+        Message testMessage = new Message("TheBradMan", "Blah Blah Blah");
+
+      //  test.AddNewThread(testThread2);
+
+        test.sendMessage(testThread2, testMessage);
+
+        UserData me = test.login("Bradley Maness", "123456");
+
+        if(me != null) {
+            me.showThreads();
+        }
+
+        else
+            System.out.println("Person not found!");
 
     }
 

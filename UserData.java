@@ -41,7 +41,7 @@ public class UserData {
     }
 
     public void showThreads() {
-        chatLogs.displayAllHeadings();
+        chatLogs.displayEverything();
     }
 
     public void addMessage(Message toAdd, String threadTitle) {
@@ -51,7 +51,6 @@ public class UserData {
 
     private void appendThread(String name, String threadTitle, Message toAdd) {
         try {
-            System.out.println("Appending thread.");
             FileOutputStream dir = new FileOutputStream("User_History/" + name + "/" + threadTitle + ".txt", true);
             PrintWriter pw = new PrintWriter(dir);
 

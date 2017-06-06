@@ -107,8 +107,13 @@ public class Thread {
     public String getCreation() {
         return creationTime;
     }
+
     public String getLastUpdate() {
         return lastUpdated;
+    }
+
+    public Message getOldest() {
+        return oldest;
     }
 
     public Thread goNext() {

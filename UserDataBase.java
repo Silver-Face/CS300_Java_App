@@ -45,18 +45,34 @@ public class UserDataBase {
         }
     }
 
-    public void AddThreads(Thread toAdd) {
+    public UserData login(String name, String pswd) {
+        if(root != null)
+            return login(root, name, pswd);
+        else
+            return null;
+    }
+
+    private UserData login(UserData root, String name, String pswd) {
+        if(root == null)
+            return null;
+        else if(root.getRealName().compareTo(name) == 0 && root.getPassword().compareTo(pswd) == 0)
+            return root;
+        else if(root.getRealName().compareTo(name) > 0)
+            return login(root.goLeft(), name, pswd);
+        else
+                return login(root.goRight(), name, pswd);
+    }
+
+    public void addNewThread(Thread toAdd) {
         if (root != null) {
-
             String[] names = toAdd.getParticipants();
-
-            AddThreads(root, toAdd, names);
+            addNewThread(root, toAdd, names);
         }
     }
 
-    private void AddThreads(UserData root, Thread toAdd, String[] names) {
+    private void addNewThread(UserData root, Thread toAdd, String[] names) {
         if (root != null) {
-            AddThreads(root.goLeft(), toAdd, names);
+            addNewThread(root.goLeft(), toAdd, names);
 
             for(int i = 0; i < names.length; i++) {
                 if(names[i].compareTo(root.getRealName()) == 0) {
@@ -64,7 +80,7 @@ public class UserDataBase {
                     saveThread(root, toAdd);
                 }
             }
-            AddThreads(root.goRight(), toAdd, names);
+            addNewThread(root.goRight(), toAdd, names);
         }
     }
 
@@ -88,13 +104,14 @@ public class UserDataBase {
 
             pw.println("Creation Time: \n" + toSave.getCreation());
             pw.println("Last Updated: \n" + toSave.getLastUpdate());
+
             pw.close();
 
         } catch (FileNotFoundException e) {}
 
     }
 
-    private void loadThreads(UserData root) {
+    private void loadSavedThreads(UserData root) {
        try {
             File dir = new File("User_History/" + root.getRealName() + "/");
             File[] threads = dir.listFiles();
@@ -119,14 +136,12 @@ public class UserDataBase {
                         String time = reader.next();
                         String text = reader.next();
 
-                        System.out.println(user + time + text);
-
                         Message tempMessage = new Message(user, time, text);
 
                         temp.addMessage(tempMessage);
                     }
                // }
-                AddThreads(temp);
+                root.addThread(temp);
             }
         } catch (FileNotFoundException ex) {}
 
@@ -146,7 +161,6 @@ public class UserDataBase {
 
             for(int i = 0; i < sendTo.length; i++) {
                 if(sendTo[i].compareTo(root.getRealName()) == 0) {
-                    System.out.println("Match found!");
                     root.addMessage(toAdd, threadName);
                 }
             }
@@ -209,7 +223,7 @@ public class UserDataBase {
             root = add;
             HistoryCheck(root);
             userCount++;
-            loadThreads(root);
+            loadSavedThreads(root);
             saveUserList();
             return;
         }
@@ -230,7 +244,7 @@ public class UserDataBase {
                     root.setLeft(add);
                     userCount++;
                     HistoryCheck(root.goLeft());
-                    loadThreads(root.goLeft());
+                    loadSavedThreads(root.goLeft());
                     return 0;
                 }
                 else
@@ -246,7 +260,7 @@ public class UserDataBase {
                     root.setRight(add);
                     userCount++;
                     HistoryCheck(root.goRight());
-                    loadThreads(root.goRight());
+                    loadSavedThreads(root.goRight());
                     return 0;
                 }
                 else
@@ -281,14 +295,6 @@ public class UserDataBase {
     }
 
     public static void main(String[] args) {
-        UserDataBase test = new UserDataBase();
-
-        String[] people = {"Bradley Maness", "Zach Burgraff", "Joshua Moon"}, people2 = {"James Hughes", "Bradley Maness", "Melissa Ngyuyen"};
-
-        Message testMess = new Message("TheBradMan", "Don't let this fall into the wrong hands guys.");
-        Message testMess2 = new Message("Zach Burgraff", "Do not be alarmed. This is a test.");
-        //test.sendMessage(people2, "Secret Russia Hacking Manual", testMess);
-        test.sendMessage(people, "This is a test thread", testMess2);
 
     }
 }

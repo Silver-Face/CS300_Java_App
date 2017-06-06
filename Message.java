@@ -67,9 +67,6 @@ public class Message {
     }
 
     public static void main(String[] args) {
-
-//        Message test = new Message(args[0], args[1])
-//        test.viewMessage();
     }
 }
 

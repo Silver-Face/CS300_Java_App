@@ -81,22 +81,18 @@ public class Conversations {
         }
     }
 
-    public static void main(String[] args) {
-        Conversations logs = new Conversations();
-        String[] people1 = {"Bradley Maness", "James Howard Maness Jr.", "Christopher Dana"}, people2 = {"Bradley Maness", "Secret Russian Hacker Dude"};
-
-       Thread one = new Thread("Where do we want to go out for lunch?", people1);
-       Thread two = new Thread("TOP SECRET Trump-Russia collusion evidence!", people2);
-
-       one.showThreadHeading();
-       System.out.println("----------------------");
-       two.showThreadHeading();
-       System.out.println("----------------------");
-       logs.addNewThread(one);
-       logs.displayAllHeadings();
-       System.out.println("----------------------");
-       logs.addNewThread(two);
-       logs.displayAllHeadings();
-
+    public void displayEverything() {
+        if(MostRecent != null && LeastRecent != null) {
+            displayEverything(MostRecent);
+        }
     }
+
+    private void displayEverything(Thread current) {
+        if(current != null) {
+            current.showAllMessages();
+            displayEverything(current.goNext());
+        }
+    }
+
+    public static void main(String[] args) {}
 }
