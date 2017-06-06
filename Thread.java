@@ -6,13 +6,14 @@
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Scanner;
+//import java.util.Scanner;
 
 public class Thread {
     //Data
     private String title;
     private String[] participants;
     private String creationTime;
+    private String lastUpdated;
     private Message oldest, newest;
 
     private Thread next, prev;
@@ -21,7 +22,17 @@ public class Thread {
     public Thread(String ttl, String[] users) {
         title = ttl;
         participants = users;
-        creationTime = new SimpleDateFormat("MM/dd HH:mm:ss").format(new Date());
+        creationTime  = new SimpleDateFormat("MM/dd HH:mm:ss").format(new Date());
+        lastUpdated = new SimpleDateFormat("MM/dd HH:mm:ss").format(new Date());
+        oldest = null;
+        newest = null;
+    }
+
+    public Thread(String ttl, String[] users, String creation, String update) {
+        title = ttl;
+        participants = users;
+        creationTime = creation;
+        lastUpdated = update;
         oldest = null;
         newest = null;
     }
@@ -37,9 +48,16 @@ public class Thread {
             newest.setNext(toAdd);
             newest = toAdd;
         }
+
+        lastUpdated = new SimpleDateFormat("MM/dd HH:mm:ss").format(new Date());
     }
 
-    public void showAllParticipants() {
+    public void showThreadHeading() {
+        System.out.println("Title: " + title + "\nLast Updated:  " + lastUpdated + "\nFirst Created: " + creationTime);
+        showAllParticipants();
+    }
+
+    private void showAllParticipants() {
         if(participants != null) {
             for(int i = 0; i < participants.length; i++) {
                 if(i != participants.length-1)
@@ -51,10 +69,7 @@ public class Thread {
     }
 
     public void showAllMessages() {
-        System.out.println("Message Title: " + title);
-        System.out.print("Message Participants: ");
-        showAllParticipants();
-        System.out.println("Created on " + creationTime);
+        showThreadHeading();
         if(oldest == null && newest == null) {
             System.out.println("No messages yet. Be the first!");
         }
@@ -63,11 +78,37 @@ public class Thread {
         }
     }
 
+    public boolean compareParti(String toComp) {
+        if(participants != null) {
+            for(int i = 0; i < participants.length - 1; i++) {
+                if(participants[i].compareTo(toComp) == 0)
+                    return true;
+            }
+        }
+
+        return false;
+    }
+
     private void showAllMessages(Message current) {
         if(current != null) {
             current.viewMessage();
             showAllMessages(current.goNext());
         }
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String[] getParticipants() {
+        return participants;
+    }
+
+    public String getCreation() {
+        return creationTime;
+    }
+    public String getLastUpdate() {
+        return lastUpdated;
     }
 
     public Thread goNext() {
@@ -87,28 +128,9 @@ public class Thread {
     }
 
     public static void main(String[] args) {
-      /* int switchUser = 0;
-        Scanner input = new Scanner(System.in);
+      /*  String[] people = {"me", "you"};
+        Thread test = new Thread("This is a test thread", people);
 
-        Thread test = new Thread("TestTitle", args);
-
-        test.showAllMessages();
-    /*
-        System.out.println("You just created a new thread. Your test username will change.");
-
-        for(int i = 0; i < 5; i++) {
-            if(switchUser == 0)
-                switchUser = 1;
-            else
-                switchUser = 0;
-
-            System.out.print("<" + args[switchUser] + "> ");
-            String text = input.nextLine();
-            Message temp = new Message(args[switchUser], text);
-            test.addMessage(temp);
-        }
-
-        test.showAllMessages();
-    */
+        test.showThreadHeading(); */
     }
 }

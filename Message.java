@@ -26,8 +26,28 @@ public class Message {
         prev = null;
     }
 
+    public Message(String usr, String time, String txt) {
+        user = usr;
+        timeStamp = time;
+        text = txt;
+        next = null;
+        prev = null;
+    }
+
     public void viewMessage() {
         System.out.println("<" + user + " @ " + timeStamp + "> " + text);
+    }
+
+    public String getUser() {
+        return user;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public String getTimeStamp() {
+        return timeStamp;
     }
 
     public void setNext(Message add) {

@@ -17,45 +17,152 @@ public class UserDataBase {
     public UserDataBase() {
         userCount = 0;
         build();
+        saveUserList();
     }
 
-    //This method reads in user data from a file "users.txt", inserts them
-    //into a dynamic array of UserData items  which then creates a binary
-    //search tree.
-    public void build() {
-        File userFile = new File("users.txt");
-        try {
-            if(userFile.exists()) {
-                Scanner read = new Scanner(userFile);
-                read.useDelimiter("\\n");
-                int userNum = read.nextInt();
-                System.out.println(userNum);
+    private void build() {
 
-                while(read.hasNext()) {
+        try {
+            File userFile = new File("UserList.txt");
+            if (userFile.exists()) {
+                Scanner read = new Scanner(userFile);
+                read.useDelimiter(";|\\n");
+
+                int throwAwayInt = read.nextInt();
+
+                while (read.hasNext()) {
                     String name = read.next();
-                    System.out.println(name);
                     String user = read.next();
-                    System.out.println(user);
                     String pswd = read.next();
-                    System.out.println(pswd);
 
                     UserData addNew = new UserData(name, user, pswd);
                     insert(addNew);
                 }
-            }
-            else
+            } else
                 throw new FileNotFoundException();
+        } catch (FileNotFoundException ex) {
+            System.out.println("Error! File Not Found!");
         }
-        catch (FileNotFoundException ex) {}
     }
 
-    public void saveUserList() {
-        if(root == null) return;
-        else{
+    public void AddThreads(Thread toAdd) {
+        if (root != null) {
+
+            String[] names = toAdd.getParticipants();
+
+            AddThreads(root, toAdd, names);
+        }
+    }
+
+    private void AddThreads(UserData root, Thread toAdd, String[] names) {
+        if (root != null) {
+            AddThreads(root.goLeft(), toAdd, names);
+
+            for(int i = 0; i < names.length; i++) {
+                if(names[i].compareTo(root.getRealName()) == 0) {
+                    root.addThread(toAdd);
+                    saveThread(root, toAdd);
+                }
+            }
+            AddThreads(root.goRight(), toAdd, names);
+        }
+    }
+
+    private void saveThread(UserData root, Thread toSave) {
+        try {
+            FileOutputStream threadFile = new FileOutputStream("User_History/" + root.getRealName() + "/" + toSave.getTitle() + ".txt");
+            PrintWriter pw = new PrintWriter(threadFile);
+
+            pw.println(toSave.getTitle());
+
+            String[] people = toSave.getParticipants();
+
+            pw.print(people.length + ";");
+
+            for(int i = 0; i < people.length; i++) {
+                if((i+1) == people.length)
+                    pw.println(people[i]);
+                else
+                    pw.print(people[i] + ";");
+            }
+
+            pw.println("Creation Time: \n" + toSave.getCreation());
+            pw.println("Last Updated: \n" + toSave.getLastUpdate());
+            pw.close();
+
+        } catch (FileNotFoundException e) {}
+
+    }
+
+    private void loadThreads(UserData root) {
+       try {
+            File dir = new File("User_History/" + root.getRealName() + "/");
+            File[] threads = dir.listFiles();
+
+            for(int i = 0; i < threads.length; i++) {
+                Scanner reader = new Scanner(threads[i]);
+                reader.useDelimiter(";|\\n");
+                String title = reader.next();
+                String[] people = new String[reader.nextInt()];
+                for(int j = 0; j < people.length; j++) {
+                    people[j] = reader.next();
+                }
+                String throwaway = reader.next();
+                String creation = reader.next();
+                throwaway = reader.next();
+                String update = reader.next();
+
+                Thread temp = new Thread(title, people, creation, update);
+               // if(reader.hasNext()) {
+                    while(reader.hasNext()) {
+                        String user = reader.next();
+                        String time = reader.next();
+                        String text = reader.next();
+
+                        System.out.println(user + time + text);
+
+                        Message tempMessage = new Message(user, time, text);
+
+                        temp.addMessage(tempMessage);
+                    }
+               // }
+                AddThreads(temp);
+            }
+        } catch (FileNotFoundException ex) {}
+
+        return;
+    }
+
+    public void sendMessage(String[] sendTo, String threadName, Message toAdd) {
+        if(root != null) {
+            sendMessage(root, sendTo, threadName, toAdd);
+        }
+    }
+
+    private void sendMessage(UserData root, String[] sendTo, String threadName, Message toAdd) {
+        if(root != null) {
+
+            sendMessage(root.goLeft(), sendTo, threadName, toAdd);
+
+            for(int i = 0; i < sendTo.length; i++) {
+                if(sendTo[i].compareTo(root.getRealName()) == 0) {
+                    System.out.println("Match found!");
+                    root.addMessage(toAdd, threadName);
+                }
+            }
+
+            sendMessage(root.goRight(), sendTo, threadName, toAdd);
+        }
+
+
+    }
+
+    private void saveUserList() {
+        if (root != null) {
             FileOutputStream os = null;
             PrintWriter pw = null;
-            try{
-                os = new FileOutputStream("users.txt");
+            try {
+                os = new FileOutputStream("UserList.txt");
                 pw = new PrintWriter(os);
 
                 pw.write(userCount + "\n");
@@ -63,7 +170,7 @@ public class UserDataBase {
                 saveUserList(root, pw);
 
                 pw.flush();
-            } catch(IOException e) {
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         }
@@ -72,8 +179,8 @@ public class UserDataBase {
     private void saveUserList(UserData root, PrintWriter w) {
         if(root != null) {
             saveUserList(root.goLeft(), w);
-            w.println(root.getRealName());
-            w.println(root.getUserName());
+            w.print(root.getRealName() + ";");
+            w.print(root.getUserName() + ";");
             w.println(root.getPassword());
             saveUserList(root.goRight(), w);
         }
@@ -91,37 +198,69 @@ public class UserDataBase {
         showAllNames(root.goLeft());
 
         root.displayName();
+        root.showThreads();
 
         showAllNames(root.goRight());
     }
 
     //insert methods
     public void insert(UserData add) {
-        if(root == null) root = add;
+        if(root == null) {
+            root = add;
+            HistoryCheck(root);
+            userCount++;
+            loadThreads(root);
+            saveUserList();
+            return;
+        }
         else {
             insert(root, add);
+            saveUserList();
+
         }
-        userCount += 1;
+
     }
 
-    private void insert(UserData root, UserData add) {
-        if(root == null) return;
+    private int insert(UserData root, UserData add) {
+        if(root == null) return 0;
 
         else{
             if(root.getRealName().compareTo(add.getRealName()) > 0) {
-                if(root.goLeft() == null)
+                if (root.goLeft() == null) {
                     root.setLeft(add);
+                    userCount++;
+                    HistoryCheck(root.goLeft());
+                    loadThreads(root.goLeft());
+                    return 0;
+                }
                 else
                     insert(root.goLeft(), add);
 
             }
+
+            else if(root.getRealName().compareTo(add.getRealName()) == 0)
+                    return 1;
+
             else {
-                if(root.goRight() == null)
+                if (root.goRight() == null) {
                     root.setRight(add);
+                    userCount++;
+                    HistoryCheck(root.goRight());
+                    loadThreads(root.goRight());
+                    return 0;
+                }
                 else
                     insert(root.goRight(), add);
             }
         }
+
+        return 0;
+    }
+
+    private void HistoryCheck(UserData root) {
+        File checkDir = new File("User_History/" + root.getRealName());
+        if (!checkDir.exists())
+            checkDir.mkdirs();
     }
 
     //search methods
@@ -141,4 +280,15 @@ public class UserDataBase {
         else return searchName(root.goRight(), toFind);
     }
 
+    public static void main(String[] args) {
+        UserDataBase test = new UserDataBase();
+
+        String[] people = {"Bradley Maness", "Zach Burgraff", "Joshua Moon"}, people2 = {"James Hughes", "Bradley Maness", "Melissa Ngyuyen"};
+
+        Message testMess = new Message("TheBradMan", "Don't let this fall into the wrong hands guys.");
+        Message testMess2 = new Message("Zach Burgraff", "Do not be alarmed. This is a test.");
+        //test.sendMessage(people2, "Secret Russia Hacking Manual", testMess);
+        test.sendMessage(people, "This is a test thread", testMess2);
+
+    }
 }

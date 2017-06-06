@@ -8,7 +8,7 @@ public class ChatServer {
 //Data Members
   //  private JFrame mainFrame;
   //  private JButton okButton;
-   // private UserDataBase UserList;
+    private UserDataBase UserList;
 
 //Method Members
 
@@ -22,23 +22,32 @@ public class ChatServer {
         okButton = new JButton("OK");
         okButton.setBounds(300, 100, 300, 100);
         mainFrame.add(okButton);
-
-   */
-    //    UserList = new UserDataBase();
+        */
+        UserList = new UserDataBase();
     }
 
-    public void CreateAccount() {}
+    public void CreateAccount(UserData newUser) {
+
+    }
 
     public void login() {}
 
-    //public void ShowAllUsers() {
-      //  UserList.showAllNames();
-    //}
+    public void AddThread(Thread toAdd) {
+        if(UserList != null) {
+            UserList.AddThreads(toAdd);
+        }
+    }
+
+    public void ShowAllUsers() {
+        UserList.showAllNames();
+    }
 
     public static void main(String[] args) {
-        ChatServer myServer = new ChatServer();
+        //ChatServer myServer = new ChatServer();
 
-    //    myServer.ShowAllUsers();
+       // UserData test = myServer.UserList.searchName("Bradley Maness");
+
+        //test.display();
 
     }
 

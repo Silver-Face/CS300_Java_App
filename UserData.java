@@ -6,26 +6,61 @@
     it will also contain references to turn it into a Binary Search Tree Node.
 
  */
- public class UserData {
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintWriter;
+
+public class UserData {
      //Data
     private String realName, userName, password;
     private boolean isOnline;
+    private Conversations chatLogs;
     private UserData Left, Right;
     //methods
     public UserData(String rN, String uN, String pswd) {
         realName = rN;
         userName = uN;
         password = pswd;
+        chatLogs = new Conversations();
         isOnline = false;
         Left = null;
         Right = null;
     }
+
+    //public void addMessage(Message toAdd, String title)
 
     public void display() {
         System.out.println("Name: " + realName);
         System.out.println("Username: " + userName);
         System.out.println("Password: " + password);
     }
+
+    public void addThread(Thread toAdd) {
+        chatLogs.addNewThread(toAdd);
+    }
+
+    public void showThreads() {
+        chatLogs.displayAllHeadings();
+    }
+
+    public void addMessage(Message toAdd, String threadTitle) {
+        chatLogs.addMessage(toAdd, threadTitle);
+        appendThread(realName, threadTitle, toAdd);
+    }
+
+    private void appendThread(String name, String threadTitle, Message toAdd) {
+        try {
+            System.out.println("Appending thread.");
+            FileOutputStream dir = new FileOutputStream("User_History/" + name + "/" + threadTitle + ".txt", true);
+            PrintWriter pw = new PrintWriter(dir);
+
+            pw.print(toAdd.getUser() + ";" + toAdd.getTimeStamp() + ";" + toAdd.getText() + "\n");
+            pw.close();
+        } catch (FileNotFoundException ex) {}
+    }
+
+   // public void recordNewThread(Thread toRecord) {}
 
     public void displayName() {
         System.out.println(realName);
@@ -46,7 +81,7 @@
     public UserData goRight() {
         return Right;
     }
-//"Getter methods for returning data for comparison and sorting in BST data structure.
+
     public String getRealName(){
         return realName;
     }
@@ -64,5 +99,27 @@
     }
     public void goOffline() {
         if(isOnline == true) isOnline = false;
+    }
+
+    public static void main(String[] args) {
+        UserData test = new UserData("Brad", "BradManForver", "12345");
+        String[] people = {"Brad", "Melissa"};
+        Thread dinner = new Thread("I'm hungry. Let's go eat.", people);
+        Thread one = new Thread("This is a test thread", people);
+        Thread two = new Thread("This a second test thread", people);
+        test.addThread(one);
+        test.addThread(dinner);
+        test.addThread(two);
+
+        test.showThreads();
+
+        Message testMessage = new Message(test.getUserName(), "I'm thinking sushi or burgers. What do you have in mind?");
+
+        test.addMessage(testMessage, "I'm hungry. Let's go eat.");
+
+        test.showThreads();
+
+
+
     }
 }
