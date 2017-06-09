@@ -4,26 +4,43 @@
 //import javax.swing.*;
 //import java.util.Scanner;
 
+
+
+import java.io.*;
+import java.net.*;
+
 public class ChatServer {
 //Data Members
-  //  private JFrame mainFrame;
-  //  private JButton okButton;
     private UserDataBase UserList;
+    private ServerSocket sSocket;
+    private boolean serverActive;
 
 //Method Members
 
     public ChatServer() {
-        /*
-        mainFrame = new JFrame("This is a test.");
-        mainFrame.setSize(500, 300);
-        mainFrame.setLayout(null);
-        mainFrame.setVisible(true);
-
-        okButton = new JButton("OK");
-        okButton.setBounds(300, 100, 300, 100);
-        mainFrame.add(okButton);
-        */
         UserList = new UserDataBase();
+       /* try {
+            sSocket = new ServerSocket(88888);
+        } catch (IOException e) {
+            System.out.println("Error! Could not start server on port.");
+            System.exit(-1);
+        }
+
+        while(serverActive) {
+            try {
+                Socket cSocket = sSocket.accept();
+                System.out.println("Client Connected");
+
+                //ConnectionHandler cHand = new ConnectionHandler(cSocket);
+            } catch (IOException e) {
+                System.out.println("Something bad happened.");
+            }
+        }
+
+        try {
+            sSocket.close();
+            System.out.println("Server no longer running.");
+        } catch (Exception e) { System.exit(-1);} */
     }
 
     public void CreateAccount(UserData newUser) {
@@ -57,26 +74,6 @@ public class ChatServer {
     }
 
     public static void main(String[] args) {
-        ChatServer test = new ChatServer();
-        String[] people = {"Bradley Maness", "James Hughes"};
-
-        Thread testThread = new Thread("This is a test thread", people);
-        Thread testThread2 = new Thread("Second Thread", people);
-
-        Message testMessage = new Message("TheBradMan", "Blah Blah Blah");
-
-      //  test.AddNewThread(testThread2);
-
-        test.sendMessage(testThread2, testMessage);
-
-        UserData me = test.login("Bradley Maness", "123456");
-
-        if(me != null) {
-            me.showThreads();
-        }
-
-        else
-            System.out.println("Person not found!");
 
     }
 

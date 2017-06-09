@@ -36,12 +36,20 @@ public class UserData {
         System.out.println("Password: " + password);
     }
 
+    public Conversations getChatLog() {
+        return chatLogs;
+    }
+
     public void addThread(Thread toAdd) {
         chatLogs.addNewThread(toAdd);
     }
 
     public void showThreads() {
         chatLogs.displayEverything();
+    }
+
+    public Thread getThread(String name) {
+        return chatLogs.getThread(name);
     }
 
     public void addMessage(Message toAdd, String threadTitle) {
